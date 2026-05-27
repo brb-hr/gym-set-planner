@@ -6,10 +6,10 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#121212",
-  "theme_color": "#007aff",
+  "theme_color": "#121212",
   "icons": [
     {
-      "src": "https://placehold.co/192x192/007aff/fff?text=Fit",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
