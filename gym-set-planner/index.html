@@ -89,7 +89,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            touch-action: none;
+            /* touch-action: none; WURDE ENTFERNT: Erlaubt normales Scrollen auf dem Bild */
         }
 
         .exercise-card img {
@@ -112,6 +112,7 @@
             cursor: grab;
             z-index: 10;
             border: 1px solid #444;
+            touch-action: none; /* NEU HIER: Blockiert Scrollen NUR, wenn man den Griff zieht */
         }
 
         .blue-divider {
@@ -143,7 +144,7 @@
 </head>
 <body>
 
-    <div class="instruction">Griff [☰ Move] halten: Frei nach oben/unten über die Linie ziehen</div>
+    <div class="instruction">Wische auf den Bildern zum Scrollen. Halte [☰ Move] zum Sortieren.</div>
 
     <div class="list-container">
         <div id="active-set" class="list-section"></div>
@@ -152,8 +153,6 @@
     </div>
 
     <script>
-        // Startdaten mit Platzhalter-Bildern
-        // TIPP: Tausche diese URLs später gegen deine lokalen Bildnamen aus, z.B. "übungen/pushup.png"
         const defaultExercises = [
             { id: "ex1", img: "https://placehold.co/600x350/222/fff?text=1.+Liegestuetz", status: "active" },
             { id: "ex2", img: "https://placehold.co/600x350/333/fff?text=2.+Klimmzuege", status: "active" },
@@ -278,7 +277,6 @@
 
         render();
 
-        // HIER NEU: Service Worker Registrierung für PWA-Funktionalität
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
