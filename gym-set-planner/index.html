@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Set Planer</title>
+    
+    <link rel="manifest" href="manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <style>
+        :root {
+            --blue-divider: #007aff;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .instruction {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .list-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: background-color 0.2s ease;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        #active-set:empty, #pool-set:empty {
+            min-height: 80px;
+            border: 2px dashed #333;
+            background-color: rgba(255,255,255,0.02);
+        }
+
+        #active-set:empty::after {
+            content: "Zieh Übungen hierhin nach oben";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        #pool-set:empty::after {
+            content: "Pool leer";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 80px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .exercise-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            touch-action: none;
+        }
+
+        .exercise-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: grab;
+            z-index: 10;
+            border: 1px solid #444;
+        }
+
+        .blue-divider {
+            height: 6px;
+            background-color: var(--blue-divider);
+            border-radius: 3px;
+            margin: 20px 0;
+            box-shadow: 0 0 12px rgba(0, 122, 255, 0.6);
+            position: relative;
+        }
+
+        .blue-divider::after {
+            content: "POOL / INAKTIV";
+            position: absolute;
+            right: 10px;
+            top: -18px;
+            font-size: 0.7rem;
+            color: var(--blue-divider);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .dragging {
+            opacity: 0.4;
+            transform: scale(0.96);
+            border: 2px dashed var(--blue-divider);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="instruction">Griff [☰ Move] halten: Frei nach oben/unten über die Linie ziehen</div>
+
+    <div class="list-container">
+        <div id="active-set" class="list-section"></div>
+        <div id="divider" class="blue-divider"></div>
+        <div id="pool-set" class="list-section"></div>
+    </div>
+
+    <script>
+        // Startdaten mit Platzhalter-Bildern
+        // TIPP: Tausche diese URLs später gegen deine lokalen Bildnamen aus, z.B. "übungen/pushup.png"
+        const defaultExercises = [
+            { id: "ex1", img: "https://placehold.co/600x350/222/fff?text=1.+Liegestuetz", status: "active" },
+            { id: "ex2", img: "https://placehold.co/600x350/333/fff?text=2.+Klimmzuege", status: "active" },
+            { id: "ex3", img: "https://placehold.co/600x350/444/fff?text=3.+Bizeps+Curl", status: "pool" },
+            { id: "ex4", img: "https://placehold.co/600x350/555/fff?text=4.+Dips", status: "pool" }
+        ];
+
+        let state = JSON.parse(localStorage.getItem('workout_set_planner_state')) || defaultExercises;
+
+        const activeContainer = document.getElementById('active-set');
+        const poolContainer = document.getElementById('pool-set');
+        const divider = document.getElementById('divider');
+
+        function render() {
+            activeContainer.innerHTML = '';
+            poolContainer.innerHTML = '';
+
+            state.forEach(ex => {
+                const card = document.createElement('div');
+                card.className = 'exercise-card';
+                card.dataset.id = ex.id;
+                
+                card.innerHTML = `
+                    <div class="drag-handle">☰ Move</div>
+                    <img src="${ex.img}" alt="Übung">
+                `;
+
+                const handle = card.querySelector('.drag-handle');
+                handle.addEventListener('touchstart', onDragStart, {passive: false});
+                handle.addEventListener('mousedown', onDragStart);
+
+                if (ex.status === 'active') {
+                    activeContainer.appendChild(card);
+                } else {
+                    poolContainer.appendChild(card);
+                }
+            });
+        }
+
+        let dragItem = null;
+
+        function onDragStart(e) {
+            dragItem = e.target.closest('.exercise-card');
+            dragItem.classList.add('dragging');
+            
+            if(e.type === 'touchstart') {
+                window.addEventListener('touchmove', onTouchMove, {passive: false});
+                window.addEventListener('touchend', onDragEnd);
+            } else {
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onDragEnd);
+            }
+        }
+
+        function onTouchMove(e) {
+            e.preventDefault(); 
+            const touch = e.touches[0];
+            evaluateMove(touch.clientY);
+        }
+
+        function onMouseMove(e) {
+            evaluateMove(e.clientY);
+        }
+
+        function evaluateMove(y) {
+            if (!dragItem) return;
+
+            const dividerBox = divider.getBoundingClientRect();
+            const isAboveLine = y < (dividerBox.top + dividerBox.height / 2);
+            
+            const targetContainer = isAboveLine ? activeContainer : poolContainer;
+            
+            const cards = Array.from(targetContainer.querySelectorAll('.exercise-card:not(.dragging)'));
+            let nextCard = null;
+
+            for (const card of cards) {
+                const box = card.getBoundingClientRect();
+                if (y < box.top + box.height / 2) {
+                    nextCard = card;
+                    break;
+                }
+            }
+
+            if (nextCard) {
+                targetContainer.insertBefore(dragItem, nextCard);
+            } else {
+                targetContainer.appendChild(dragItem);
+            }
+        }
+
+        function onDragEnd() {
+            if (dragItem) {
+                dragItem.classList.remove('dragging');
+                dragItem = null;
+            }
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('touchend', onDragEnd);
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onDragEnd);
+            
+            saveState();
+        }
+
+        function saveState() {
+            const newState = [];
+            
+            activeContainer.querySelectorAll('.exercise-card').forEach(card => {
+                const id = card.dataset.id;
+                const original = state.find(ex => ex.id === id);
+                newState.push({ ...original, status: 'active' });
+            });
+
+            poolContainer.querySelectorAll('.exercise-card').forEach(card => {
+                const id = card.dataset.id;
+                const original = state.find(ex => ex.id === id);
+                newState.push({ ...original, status: 'pool' });
+            });
+
+            state = newState;
+            localStorage.setItem('workout_set_planner_state', JSON.stringify(state));
+        }
+
+        render();
+
+        // HIER NEU: Service Worker Registrierung für PWA-Funktionalität
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registriert!', reg))
+                    .catch(err => console.error('Service Worker Fehler:', err));
+            });
+        }
+    </script>
+</body>
+</html>
