@@ -1,7 +1,18 @@
 const CACHE_NAME = 'set-planner-v1';
 const ASSETS = [
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './images/ausfall.png',
+  './images/beinheben.png',
+  './images/birddog.png',
+  './images/bizeps.png',
+  './images/deadbug.png',
+  './images/klimmzug.png',
+  './images/liegestuetz.png',
+  './images/rudern.png',
+  './images/sideplank.png',
+  './images/trizeps.png',
+  './images/zehenstand.png'
 ];
 
 // Installieren und Daten in den Cache laden

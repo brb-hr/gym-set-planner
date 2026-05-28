@@ -153,12 +153,19 @@
     </div>
 
     <script>
-        const defaultExercises = [
-            { id: "ex1", img: "https://placehold.co/600x350/222/fff?text=1.+Liegestuetz", status: "active" },
-            { id: "ex2", img: "https://placehold.co/600x350/333/fff?text=2.+Klimmzuege", status: "active" },
-            { id: "ex3", img: "https://placehold.co/600x350/444/fff?text=3.+Bizeps+Curl", status: "pool" },
-            { id: "ex4", img: "https://placehold.co/600x350/555/fff?text=4.+Dips", status: "pool" }
-        ];
+const defaultExercises = [
+    { id: "ex1", img: "images/liegestuetz.png", status: "active" },
+    { id: "ex2", img: "images/klimmzug.png", status: "active" },
+    { id: "ex3", img: "images/bizeps.png", status: "active" },
+    { id: "ex4", img: "images/trizeps.png", status: "active" },
+    { id: "ex5", img: "images/ausfall.png", status: "pool" },
+    { id: "ex6", img: "images/beinheben.png", status: "pool" },
+    { id: "ex7", img: "images/birddog.png", status: "pool" },
+    { id: "ex8", img: "images/deadbug.png", status: "pool" },
+    { id: "ex9", img: "images/rudern.png", status: "pool" },
+    { id: "ex10", img: "images/sideplank.png", status: "pool" },
+    { id: "ex11", img: "images/zehenstand.png", status: "pool" }
+];
 
         let state = JSON.parse(localStorage.getItem('workout_set_planner_state')) || defaultExercises;
 
