@@ -33,7 +33,7 @@
         }
 
         .instruction {
-            font-size: 0.85rem;
+            font-size: 0.5rem; 
             color: #888;
             margin-bottom: 15px;
             text-align: center;
@@ -99,20 +99,28 @@
             pointer-events: none;
         }
 
+        /* NEU ANGEPASST: Griff jetzt weiß, mit schwarzem Icon, ohne Text */
         .drag-handle {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 14px;
+            background: #ffffff; /* Weisser Hintergrund */
+            color: #000000; /* Schwarze Icon-Farbe */
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: grab;
             z-index: 10;
-            border: 1px solid #444;
-            touch-action: none; /* NEU HIER: Blockiert Scrollen NUR, wenn man den Griff zieht */
+            border: none;
+            touch-action: none;
+            
+            /* Neue Grössen- und Zentrierungsregeln */
+            width: 20px; /* Fixe Grösse des Griffbereichs (ohne padding) */
+            height: 20px;
+            display: flex; /* Zum zentrieren */
+            align-items: center;
+            justify-content: center;
+            padding: 8px; /* Gesamthöhe/breite ist 36x36px */
         }
 
         .blue-divider {
@@ -144,7 +152,7 @@
 </head>
 <body>
 
-    <div class="instruction">Wische auf den Bildern zum Scrollen. <br> Halte [☰ Move] zum Sortieren. <br> (C) Bruno Bumm 2026</div>
+    <div class="instruction">Wische auf den Bildern zum Scrollen. Halte [☰] zum Sortieren. (C) Bruno Bumm 2026</div>
 
     <div class="list-container">
         <div id="active-set" class="list-section"></div>
@@ -183,7 +191,7 @@ const defaultExercises = [
                 card.dataset.id = ex.id;
                 
                 card.innerHTML = `
-                    <div class="drag-handle">☰ Move</div>
+                    <div class="drag-handle">☰</div>
                     <img src="${ex.img}" alt="Übung">
                 `;
 
