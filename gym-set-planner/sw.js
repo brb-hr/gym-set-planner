@@ -12,7 +12,7 @@ const ASSETS = [
   './images/rudern.png',
   './images/sideplank.png',
   './images/trizeps.png',
-  './images/zehenstand.png'
+  './images/zehenstand.png',
   './images/unterarm.png'
 ];
 
